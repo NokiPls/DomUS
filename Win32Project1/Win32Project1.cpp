@@ -227,36 +227,33 @@ void ScanFile(char* dump) {
 
 	printf("[+] Opening File ..\n");
 
-	std::string str((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-	std::vector<uint8_t> myVector(str.begin(), str.end());
-	uint8_t *p = &myVector[0];
+	std::string fullDump((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+	std::vector<uint8_t> vectorDump(fullDump.begin(), fullDump.end());
+	uint8_t *p = &vectorDump[0];
 	
-	uint8_t *bmBegin = boyer_moore(p, str.length(), begin, 4);
-	uint8_t *bmEnd = boyer_moore(p, str.length(), end, 7);
+	uint8_t *bmBegin = boyer_moore(p, vectorDump.size(), begin, 3);
+	uint8_t *bmEnd = boyer_moore(p, vectorDump.size(), end, 5);
 
-	std::vector<uint8_t> DOM(bmBegin, bmEnd + 7); // Hardcoding
-	int i;
-	while (!DOM.empty()) {
-		for (i = 0; i < DOM.size(); i++)
+	std::vector<uint8_t> dom(bmBegin, bmEnd + 7); // Hardcoding
+	int toRead = vectorDump.size() - dom.size();
+	int j = 1;
+	while (!dom.empty()) {
+		for (int i = 0; i < dom.size(); i++)
 		{
-			output << DOM[i];
+			output << dom[i];
 		}
 		// Move ahead in the string.
-		bmBegin = boyer_moore(bmEnd, str.length(), begin, 4);
-		bmEnd = boyer_moore(bmEnd, str.length(), end, 7);
-		DOM.clear();
+		bmBegin = boyer_moore(bmEnd + 7, toRead, &begin[0], 3);
+		bmEnd = boyer_moore(bmEnd + 7, toRead, &end[0], 5);
 		printf("blablabla");
 		if (bmBegin != NULL && bmEnd != NULL) {
-			DOM.insert(DOM.end(), bmBegin, bmEnd + 7);
+			std::vector<uint8_t> temp(bmBegin, bmEnd + 7);
+			dom.swap(temp);
+			toRead -= dom.size();
 		}
-		printf("Iteration: %d\n", i);
+		printf("Iteration: %d\n", j);
+		j++;
 	}
-	
-	//size_t posB = str.find("<!DOCTYPE html>\n<html>\n<head>");  // Hardcoded
-	//size_t posE = str.find("</html>");
-	//boyer_moore(begin, 4, p, myVector.size)
-	//cout << boyer_moore(begin, 4, p, myVector.size);
-	//output << str.substr(boyer_moore(begin, 4, p, myVector.size), abs(int(posE - posB)));
 	output.close();
 	
 }
