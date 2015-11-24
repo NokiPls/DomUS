@@ -140,10 +140,12 @@ void scanString(uint8_t* string, uint32_t size) {
 
 	int i = 0;
 
-	uint8_t begin[4] = { '<', '!','D', 'O' }; // Hardcoding everywhere
-	uint8_t end[7] = { '<', '/','h', 't', 'm', 'l', '>' };
+	uint8_t begin[4] = { 't', 'h','i', 's' }; // Hardcoding everywhere
+	uint8_t end[7] = { 'm', 'o','t', 'h', 'e', 'r', 'f' };
 
 	std::ofstream output("C:/Users/pc/Desktop/DOM.DMP", ios::out | ios::app);  // Hardcoded
+	
+	if (!output.is_open()) exit(-1);  // Can't open file.
 	printf("[+] Opening DOM File ..\n");
 
 	uint8_t *bmBegin = boyer_moore(string, size, begin, 3);
@@ -160,6 +162,7 @@ void scanString(uint8_t* string, uint32_t size) {
 	int toRead = size - dom.size();
 	int j = 1;
 	while (!dom.empty()) {
+		printf("Writing something..\n");
 		for (int i = 0; i < dom.size(); i++)
 		{
 			output << dom[i];
@@ -236,14 +239,13 @@ void scanBuffer(char* buffer, uint32_t size, uint32_t baseAddress) {
 
 //TODO: vectorBuffer ha il contenuto corretto?
 void scanBuffer(unsigned char* buffer, uint64_t size, uint64_t baseAddress) {
-	std::vector<uint8_t> vectorBuffer(baseAddress, size);
-	scanString(&vectorBuffer[0], vectorBuffer.size());
+	scanString(buffer, (uint32_t)size);
 }
 
 void scanDump(char* dump) {
 
 	std::ifstream input(dump, std::ios::binary);
-
+	if (!input.is_open()) exit(-1);  // Can't open file
 	std::string fullDump((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
 	std::vector<uint8_t> vectorDump(fullDump.begin(), fullDump.end());
 	scanString(&vectorDump[0], vectorDump.size());
